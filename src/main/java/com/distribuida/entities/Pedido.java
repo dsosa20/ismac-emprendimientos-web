@@ -78,6 +78,16 @@ public class Pedido {
 		this.confirmacionPedido = confirmacionPedido;
 	}
 
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+
 	@Override
 	public String toString() {
 		return "Pedido [idPedido=" + idPedido + ", numPedido=" + numPedido + ", fechapedido=" + fechapedido

@@ -14,12 +14,10 @@ public interface FacturaService {
 	
 	public void add(int idFacturaDetalle, String producto, int cantidad, Double preUnidad, Double subTotal,
 			Double descuento1, Double descuento2, int idFactura, int idEmpresaProducto);
+	
 	public void add(int idFactura, String numFactura, Date fechaFactura, Double totalNeto, Double iva, Double total,
 			int idCliente , int idPedido , int idFormaPago);	
 	
 	public int findMax();
-	public int findOne(String numFactura);
-	
-	public List<Factura> findAll(String busqueda);
-
+	public int findOne(String numFactura);	
 }

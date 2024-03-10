@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -127,7 +128,7 @@ public class Cliente {
 		this.genero = genero;
 	}
 
-	public Date getFecha_nac() {
+	public Date getFechadenacimiento() {
 		return fechadenacimiento;
 	}
 
@@ -138,17 +139,10 @@ public class Cliente {
 	public String getTelefono() {
 		return telefono;
 	}
-	
-	
-
-
-
 
 	public Usuario getUsuario() {
 		return usuario;
 	}
-
-
 
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
