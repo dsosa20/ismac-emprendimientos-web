@@ -21,13 +21,13 @@ public class ProductoServiceImpl implements ProductoService {
 	private CategoriaDAO categoriaDAO;
 	
 	@Override
-	public List<Producto> finAll() {
+	public List<Producto> findAll() {
 		// TODO Auto-generated method stub
 		return productoDAO.findAll();
 	}
 
 	@Override
-	public Producto finOne(int id) {
+	public Producto findOne(int id) {
 		// TODO Auto-generated method stub
 		return productoDAO.findOne(id);
 	}

@@ -13,11 +13,12 @@
 	<button id="mostrar-cliente">Agregar Cliente</button>
 	<button id="mostrar-pedido">Agregar Pedido</button>
 	<button id="mostrar-formapago">Agregar Forma de pago</button>
-	<button id="mostrar-producto">Agregar Producto</button>
 	<button id="mostrar-empresaProducto">Agregar Empresa Producto</button>
 	
 	<textarea >${empresa_productosAgregados}</textarea>
 	<textarea >${productosAgregados}</textarea>
+	
+	<hr/>
 	
 	<div>
 		<dialog id="alert-dialog-clientes">
@@ -61,7 +62,6 @@
 		</dialog>
 	</div>
 	
-	
 	<div>
 		<dialog id="alert-dialog-pedidos">
 			<form action="findOnePedido" id="formPedido" name="formPedido" method="get" >
@@ -96,7 +96,7 @@
 		</dialog>
 	</div>
 	
-	
+		
 	<div>
 		<dialog id="alert-dialog-formapagos">
 			<form action="findOneFormaPago" id="formFormaPago" name="formFormaPago" method="get" >
@@ -127,10 +127,163 @@
 		</dialog>
 	</div>
 
+	<div>
+		<dialog id="alert-dialog-EmpresaProductos">
+			<form action="findOneEmpresaProducto" id="formEmpresaProducto" name="formEmpresaProducto" method="get">
+				<table>
+					<thead>
+						<tr>
+							<th>ID Empresa Producto</th>
+							<th>Producto</th>
+							<th>Descripcion</th>
+							<th>Empresa</th>
+							<th>Producto</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="item" items="${empresa_productos}">
+							<tr>
+								<td>
+									<button><a href="${pageContext.request.contextPath}/facturacion/findOneEmpresaProducto?idempresa_producto=${item.idempresa_producto}">Agregar</a></button>
+								</td>
+								<td>${item.idempresa_producto}</td>
+								<td>${item.producto}</td>
+								<td>${item.descripcion}</td>
+								<td>${item.idempresa.nombreempresa}</td>
+								<td>${item.idproducto.numeroProducto}</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</form>
+				<button onClick="this.parentElement.close()">Aceptar</button>
+		</dialog>
+	</div>	
+
+	<form action="addDetalle" id="formDetalles" name="formDetalles"  method="post">
+		Numero de Factura
+		<input type="text" id="numFactura" name="numFactura" value="${numFactura}" disabled />	
+		Fecha
+		<input type="date" id="fechaActual" name="fechaActual" value="${fn:substring(fechaActual,0,10)}"  disabled />		
+		TOTAL NETO
+		<input type="number"step="any" id="totalNeto" name="totalNeto" value="${totalNeto}" placeholder="00.00" disabled />
+		IVA
+		<input type="number" step="any" id="iva" name="iva" value="${iva}" placeholder="00.00" disabled />
+		TOTAL
+		<input type="number" step="any" id="total" name="total" value="${total}" placeholder="00.00" disabled />
+		<button type="submit" onclick="${pageContext.request.contextPath}/facturacion/addDetalle?list=${list}">COMPRAR</button>	
+		<br/><br/>
+		<hr/>
+		
+		<h3> Cliente </h3>		       					
+		Cédula
+		<input type="hidden" id="idCliente" name="idCliente" value="${cliente.idCliente}" />
+		<input type="text" id="cedula" name="cedula" value="${cliente.cedula}" disabled />				
+		Nombre
+		<input type="text" id="nombre" name="nombre" value="${cliente.nombre}" disabled />				
+		Apellido
+		<input type="text" id="apellido" name="apellido" value="${cliente.apellido}" disabled />				
+		Direccion
+		<input type="text" id="direccion" name="direccion" value="${cliente.direccion}" disabled />
+		Telefono
+		<input type="text" id="telefono" name="telefono" value="${cliente.telefono}" disabled />
+		Correo
+		<input type="email" id="correo" name="correo" value="${cliente.correo}" disabled />
+	</form>
+	<hr/>
 	
-	
-	
-	
+<form action="addDetalleTemporal"  id="formDetallesTemporal" name="formDetallesTemporal" method="get">
+	<h3> <label hidden="true">Productos</label></h3>
+ 
+    <input type="hidden" id="opcionDetalle" name="opcionDetalle" value="1" />
+
+    <br/>
+
+
+    <input type="hidden" id="idFDList" name="idFDList" value="" />
+
+    <br/><br/>
+
+    <div>
+        <div style="float:left">
+            <img style="display: none;" id="ImgProducto" name="ImgProducto" width="250" height="250" src="" />
+        </div>
+
+        <div>
+            <label hidden="true">PRODUCTO</label>
+            <input style="display: none;" type="text" id="producto" name="producto" value="" disabled />
+
+            <br/>
+
+            <label hidden="true">DESCRIPCIÓN</label>
+            <input style="display: none;" type="text" id="descripcion" name="descripcion" value="" disabled />
+
+            <br/>
+
+            <label hidden="true">STOCK</label>
+            <input style="display: none;" type="number" id="numStock" name="numStock" value="" disabled />
+
+            <br/>
+
+            <label hidden="true">CANTIDAD</label>
+            <input style="display: none;" type="number" id="cantidad" name="cantidad" value="" />
+
+            <br/>
+
+            <button style="display: none;" id="btnGuardar" name="btnGuardar" type="button" onclick="document.getElementById('opcionDetalle').value='1';
+                    document.getElementById('producto').style.display='none';
+                    document.getElementById('descripcion').style.display='none';
+                    document.getElementById('ImgProducto').style.display='none';
+                    document.getElementById('cantidad').style.display='none';
+                    document.getElementById('numStock').style.display='none';
+                    document.getElementById('btnGuardar').style.display='none';
+                    document.getElementById('formDetallesTemporal').submit();">Guardar</button>
+        </div>
+    </div>
+
+    <br/><br/>
+    <br/><br/>
+
+    <div>
+        <h3>Agregar Detalles</h3>
+
+        <c:forEach var="item" items="${list}">
+            <input type="hidden" value="${item.idFacturaDetalle}">
+            Cantidad
+            <input type="number" value="${item.cantidad}" disabled>
+            Descripción
+            <input type="text" value="${item.empresaProducto.descripcion}" disabled>
+            Precio
+            <input type="number" step="any" value="${item.empresaProducto.idproducto.precioProducto}" disabled>
+            Subtotal
+            <input type="number" step="any" value="${item.subTotal}" disabled>
+            Stock
+            <input type="number" step="any" value="${item.empresaProducto.idproducto.stock}" disabled>
+
+            <button type="button" onclick="document.getElementById('opcionDetalle').value='1';
+                    document.getElementById('idFDList').value=${item.idFacturaDetalle};
+                    document.getElementById('producto').value='${item.empresaProducto.producto}';
+                    document.getElementById('descripcion').value='${item.empresaProducto.descripcion}';
+                    document.getElementById('cantidad').value=${item.cantidad};
+                    document.getElementById('stock').value=${item.empresaProducto.idproducto.stock};
+                    document.getElementById('portada').src='${pageContext.request.contextPath}/resources/img/${item.empresaProducto.idproducto.imagenProducto}';
+                    document.getElementById('producto').style.display='block';
+                    document.getElementById('descripcion').style.display='block';
+                    document.getElementById('portada').style.display='block';
+                    document.getElementById('cantidad').style.display='block';
+                    document.getElementById('numStock').style.display='block';
+                    document.getElementById('btnGuardar').style.display='block';">Editar</button>
+
+            <button type="button" onclick="document.getElementById('opcionDetalle').value='2';
+                    document.getElementById('idFDList').value=${item.idFacturaDetalle};
+                    document.getElementById('formDetalleTemporal').submit();">Eliminar</button>
+
+            <br/>
+        </c:forEach>
+    </div>
+
+</form>
+
 	
 	<script src="${pageContext.request.contextPath}/resources/js/jquery-3.7.1.js"></script>
 	<script>
@@ -151,12 +304,6 @@
 	mostrarFormaPago.addEventListener("click", function () {
 		const alertDialogFormapagos = document.querySelector("#alert-dialog-formapagos");
 		alertDialogFormapagos.showModal();
-	});
-	
-	const mostrarProducto = document.querySelector("#mostrar-producto"); 
-	mostrarProducto.addEventListener("click", function () {
-		const alertDialogProductos = document.querySelector("#alert-dialog-productos");
-		alertDialogProductos.showModal();
 	});
 	
 	const mostrarEmpresaProducto = document.querySelector("#mostrar-empresaProducto"); 

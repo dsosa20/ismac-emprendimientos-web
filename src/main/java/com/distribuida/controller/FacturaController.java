@@ -135,7 +135,7 @@ public class FacturaController {
 	private String findOneProducto(@RequestParam("idProducto") @Nullable Integer idProducto, ModelMap modelMap) {
 		
 		try {
-			if(idProducto != null) this.producto = productoService.finOne(idProducto);
+			if(idProducto != null) this.producto = productoService.findOne(idProducto);
 			load(modelMap);
 		} catch (Exception e) {
 			//TODO: handler exception
@@ -246,7 +246,7 @@ public class FacturaController {
 	        this.pedido = pedidoService.findOne(idPedido);
 	        this.formapago = formapagoService.findOne(idFormaPago);
 	        this.empresa_producto = empresa_productoService.finOne(idempresa_producto);
-	        this.producto = productoService.finOne(idProducto);
+	        this.producto = productoService.findOne(idProducto);
 	        this.empresa = empresaService.finOne(idEmpresa);
 	        
 
@@ -283,7 +283,7 @@ public class FacturaController {
 		this.pedidos = pedidoService.findAll();
 		this.formapagos = formapagoService.findAll();
 		this.empresa_productos = empresa_productoService.findAll();
-		this.productos = productoService.finAll();
+		this.productos = productoService.findAll();
 		
 		modelMap.addAttribute("fechaActual", this.fechaAtual);
 		modelMap.addAttribute("numFcatura", this.numFactura);
@@ -326,7 +326,7 @@ public class FacturaController {
 		
 		this.empresa_productos = empresa_productoService.findAll();
 		
-		this.productos = productoService.finAll();
+		this.productos = productoService.findAll();
 		
 		modelMap.addAttribute("fechaActual", this.fechaAtual);
 		modelMap.addAttribute("numFcatura", this.numFactura);

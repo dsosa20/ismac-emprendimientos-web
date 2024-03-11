@@ -6,9 +6,9 @@ import com.distribuida.entities.Producto;
 
 public interface ProductoService {
 	
-public List<Producto> finAll();
+public List<Producto> findAll();
 	
-	public Producto finOne(int id);
+	public Producto findOne(int id);
 	
 	public void add(int idProducto, String numeroProducto, String descripcion, double precioProducto, int stock,
 			String imgProducto, int fk_idCategoria);
