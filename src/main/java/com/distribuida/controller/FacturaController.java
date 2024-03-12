@@ -44,6 +44,7 @@ public class FacturaController {
 	private FormaPagoService formapagoService;
 	@Autowired 
 	private Empresa_productoService empresa_productoService;
+	
 	@Autowired
 	private ProductoService productoService;
 	@Autowired
@@ -51,140 +52,134 @@ public class FacturaController {
 	
 	private static String numFactura;
 	private static String fechaAtual;
-	private static Double totalNeto;
-	private static Double iva;
-	private static Double total;
+	private static Double totalNeto=0.0;
+	private static Double iva=0.0;
+	private static Double total=0.0;
 	
 	private static Cliente cliente;	
 	private static Pedido pedido;
 	private static FormaPago formapago;
+	
 	private static Producto producto;
 	private static Empresa_producto empresa_producto;
-	@SuppressWarnings("unused")
 	private static Empresa empresa;
-
+	
 	private static List<FacturaDetalle> list = new ArrayList<FacturaDetalle>();
+	private static List<Producto> productosAgregados = new ArrayList<Producto>();
+	private static List<Empresa_producto> empresa_productosAgregados = new ArrayList<Empresa_producto>();
+	
 	private static List<Cliente> clientes;
 	private static List<Pedido> pedidos;
 	private static List<FormaPago> formapagos;
 	private static List<Producto> productos;
 	private static List<Empresa_producto> empresa_productos;
-	private static List<Producto> productosAgregados = new ArrayList<Producto>();
-	private static List<Empresa_producto> empresa_productosAgregados = new ArrayList<Empresa_producto>();
-
-
+	private static List<Empresa> empresas;
+	
 	@SuppressWarnings("static-access")
 	@GetMapping("/principal")
 	private String cabeceraFactura(ModelMap modelMap) {
 		
-		try {
-			load(modelMap);
-			this.empresa_productosAgregados.add(empresa_productoService.finOne(1));
-		} catch (Exception e) {
-			//TODO: handle exception
-		}
+		load(modelMap);
+		this.empresa_productosAgregados.add(empresa_productoService.finOne(1));
 		
 		return "facturacion";
 	}
 	
-	
+	//Cliente	
 	@SuppressWarnings("static-access")
 	@GetMapping("/findOneCliente")
 	private String findOneCliente(@RequestParam("idCliente") @Nullable Integer idCliente, ModelMap modelMap) {
 		
-		try {
-			if(idCliente != null) this.cliente = clienteService.findOne(idCliente);
-			load(modelMap);
-		} catch (Exception e) {
-			//TODO: handler exception
-		}
+		if(idCliente != null) this.cliente = clienteService.findOne(idCliente);
+		load(modelMap);
+		
 		return "redirect:/facturacion/principal";
 	}
 	
-	
+	//Pedido
 	@SuppressWarnings("static-access")
 	@GetMapping("/findOnePedido")
 	private String findOnePedido(@RequestParam("idPedido") @Nullable Integer idPedido, ModelMap modelMap) {
 		
-		try {
-			if(idPedido != null) this.pedido = pedidoService.findOne(idPedido);
-			load(modelMap);
-		} catch (Exception e) {
-			//TODO: handler exception
-		}
+		if(idPedido != null) this.pedido = pedidoService.findOne(idPedido);
+		load(modelMap);
+		
 		return "redirect:/facturacion/principal";
 	}
 	
-	
+	//FormaPago
 	@SuppressWarnings("static-access")
 	@GetMapping("/findOneFormaPago")
 	private String findOneFormaPago(@RequestParam("idFormaPago") @Nullable Integer idFormaPago, ModelMap modelMap) {
 		
-		try {
-			if(idFormaPago != null) this.formapago = formapagoService.findOne(idFormaPago);
-			load(modelMap);
-		} catch (Exception e) {
-			//TODO: handler exception
-		}
+		if(idFormaPago != null) this.formapago = formapagoService.findOne(idFormaPago);
+		load(modelMap);
+		
 		return "redirect:/facturacion/principal";
 	}
 	
-	
+	//Producto
 	@SuppressWarnings("static-access")
 	@GetMapping("/findOneProducto")
 	private String findOneProducto(@RequestParam("idProducto") @Nullable Integer idProducto, ModelMap modelMap) {
 		
-		try {
-			if(idProducto != null) this.producto = productoService.findOne(idProducto);
-			load(modelMap);
-		} catch (Exception e) {
-			//TODO: handler exception
-		}
+		if(idProducto != null) this.producto = productoService.findOne(idProducto);
+		load(modelMap);
+		
 		return "redirect:/facturacion/principal";
 	}
-	
-	
+
+	//EmpresaProducto
 	@SuppressWarnings("static-access")
 	@GetMapping("/findOneEmpresaProducto")
 	public String findOneEmpresaProducto(@RequestParam("idempresa_producto") @Nullable Integer idempresa_producto, ModelMap modelMap) {
-	    try {
-	        if(idempresa_producto != null) {
-	            Empresa_producto empresa_producto = empresa_productoService.finOne(idempresa_producto);
-	            
-	            if(empresa_producto != null) {
-	                Producto producto = empresa_producto.getIdproducto();
-	                
-	                if (producto != null) {
-	                    if (!productosAgregados.contains(producto)) {
-	                        
-	                        productosAgregados.add(producto);
-	                        
-	                        double precio = producto.getPrecioProducto();
-	                        this.totalNeto = getFormatNumber(this.totalNeto + precio * 1);
-	                        this.iva = getFormatNumber(this.totalNeto * 0.12);
-	                        this.total = getFormatNumber(this.totalNeto + this.iva);
-	                       
-	                    } 
-	                }
-	            }
-	        }
-	        load(modelMap);
-	    } catch (Exception e) {
-			//TODO: handler exception
-	    }
-	    return "redirect:/facturacion/principal";
+		
+		if(idempresa_producto != null) {
+            Empresa_producto empresa_producto = empresa_productoService.finOne(idempresa_producto);
+            
+            if(empresa_producto != null) {
+                Producto producto = empresa_producto.getIdproducto();
+                
+                if (producto != null) {
+                	
+                	for (FacturaDetalle facturaDetalle : this.list) {
+    					this.productosAgregados.add(facturaDetalle.getEmpresaProducto().getIdproducto());							
+    				}
+                	modelMap.addAttribute("productosAgregados", this.productosAgregados);
+                	
+                	if(this.productosAgregados == null) {
+    					add(1,producto);
+    					this.totalNeto = getFormatNumber(this.totalNeto + producto.getPrecioProducto()*1);
+    					this.iva = getFormatNumber(this.totalNeto*0.12);
+    					this.total = getFormatNumber(this.totalNeto + this.iva);
+    					
+    				}else if(this.productosAgregados.size() >= 1 && !this.productosAgregados.contains(producto)) {
+    						add(1,producto);
+    						this.totalNeto = getFormatNumber(this.totalNeto + producto.getIdProducto()*1);
+    						this.iva = getFormatNumber(this.totalNeto*0.12);
+    						this.total = getFormatNumber(this.totalNeto + this.iva);											
+    				}
+                	
+                }
+                for (FacturaDetalle facturaDetalle : this.list) {
+					this.productosAgregados.add(facturaDetalle.getEmpresaProducto().getIdproducto());							
+				}
+            }
+        }
+        load(modelMap);
+        
+        return "redirect:/facturacion/principal";
 	}
 	
-	
+	//addDetalleTemporal
 	@SuppressWarnings("static-access")
 	@GetMapping("/addDetalleTemporal")
 	public String add(@RequestParam("idFDList") @Nullable Integer idFDList,
-	                  @RequestParam("cantidad") @Nullable Integer cantidad,
-	                  @RequestParam("opcionDetalle") @Nullable Integer opcionDetalle,
-	                  ModelMap modelMap) {
-
-	 try {
-	    if (opcionDetalle == 1) {
+            @RequestParam("cantidad") @Nullable Integer cantidad,
+            @RequestParam("opcionDetalle") @Nullable Integer opcionDetalle,
+            ModelMap modelMap) {
+		
+		if (opcionDetalle == 1) {
 	        FacturaDetalle facturaDetalle = this.list.get(idFDList);
 	        
 	        if (cantidad != facturaDetalle.getCantidad()) {
@@ -199,8 +194,7 @@ public class FacturaController {
 	        		subtotal = facturaDetalle.getEmpresaProducto().getIdproducto().getPrecioProducto() * facturaDetalle.getCantidad();
 	        	}
 	        	
-	        	
-	        	this.totalNeto = this.totalNeto - subtotal; //facturaDetalle.getEmpresaProducto().getIdproducto().getPrecioProducto() * facturaDetalle.getCantidad();
+	        	this.totalNeto = this.totalNeto - subtotal; 
 	            this.totalNeto = getFormatNumber(this.totalNeto + subtotal);
 	            this.iva = getFormatNumber(this.totalNeto * 0.12);
 	            this.total = getFormatNumber(this.totalNeto + this.iva);
@@ -216,14 +210,11 @@ public class FacturaController {
 	        } 
 
 	    load(modelMap);
-	 } catch (Exception e) {
-	    // TODO: handle exception
+        
+        return "redirect:/facturacion/principal";
 	}
-
-	    return "redirect:/facturacion/principal";
-	}
-
-
+	
+	//addDetalle
 	@SuppressWarnings({"static-access", "deprecation"})
 	@PostMapping("/addDetalle")
 	public String add(@RequestParam("numFactura") @Nullable String numFactura,
@@ -239,41 +230,34 @@ public class FacturaController {
 	                  @RequestParam("idEmpresa") @Nullable Integer idEmpresa,
 	                  @RequestParam("list") @Nullable List<FacturaDetalle> list,
 	                  ModelMap modelMap) {
+		
+		load(modelMap);
+        this.cliente = clienteService.findOne(idCliente);
+        this.pedido = pedidoService.findOne(idPedido);
+        this.formapago = formapagoService.findOne(idFormaPago);
+        this.empresa_producto = empresa_productoService.finOne(idempresa_producto);
+        this.producto = productoService.findOne(idProducto);
+        this.empresa = empresaService.finOne(idEmpresa);
+        
 
-	    try {
-	        load(modelMap);
-	        this.cliente = clienteService.findOne(idCliente);
-	        this.pedido = pedidoService.findOne(idPedido);
-	        this.formapago = formapagoService.findOne(idFormaPago);
-	        this.empresa_producto = empresa_productoService.finOne(idempresa_producto);
-	        this.producto = productoService.findOne(idProducto);
-	        this.empresa = empresaService.finOne(idEmpresa);
-	        
+        facturaService.add(0, numFactura, new Date(), totalNeto, iva, total, idCliente, idPedido, idFormaPago);
 
-	        facturaService.add(0, numFactura, new Date(), totalNeto, iva, total, idCliente, idPedido, idFormaPago);
+        this.list.forEach(item -> {            
+            facturaService.add(0, item.getCantidad(), item.getSubTotal(), facturaService.findMax(),item.getEmpresaProducto(),item.getProducto());
+        });
+        
+        this.list.forEach(item -> {
 
-	        this.list.forEach(item -> {
-	            facturaService.add(0, item.getProducto(), item.getCantidad(), item.getEmpresaProducto().getIdproducto().getPrecioProducto(), item.getSubTotal(), 0.0, 0.0, facturaService.findMax(), item.getEmpresaProducto().getIdempresa_producto());
-	        });
-
-	        this.list.forEach(item -> {
-	            Empresa_producto empresa_producto = item.getEmpresaProducto();
-
-	            int idEmpresaProducto = empresa_producto.getIdempresa_producto();
-	            String producto = empresa_producto.getProducto(); 
-	            String descripcion = empresa_producto.getDescripcion();  
-
-	            empresa_productoService.up(idEmpresaProducto, producto, descripcion, idEmpresa, idProducto);
-	        
-	        });
-	        clear(modelMap);
-	    } catch (Exception e) {
-	        // TODO: handle exception
-	    }
-
-	    return "redirect:/facturacion/principal";
+            empresa_productoService.up(item.getEmpresaProducto().setIdproducto(idProducto));
+        
+        });
+        clear(modelMap);
+        
+        return "redirect:/facturacion/principal";
 	}
+
 	
+	//load
 	@SuppressWarnings("static-access")
 	private void load(ModelMap modelMap) {
 		// TODO Auto-generated method stub
@@ -286,7 +270,7 @@ public class FacturaController {
 		this.productos = productoService.findAll();
 		
 		modelMap.addAttribute("fechaActual", this.fechaAtual);
-		modelMap.addAttribute("numFcatura", this.numFactura);
+		modelMap.addAttribute("numFactura", this.numFactura);
 		modelMap.addAttribute("totalNeto", this.totalNeto);
 		modelMap.addAttribute("iva", this.iva);
 		modelMap.addAttribute("total",this.total);
@@ -306,7 +290,7 @@ public class FacturaController {
 		modelMap.addAttribute("productos", this.productos);
 	}
 	
-	
+	//clear
 	@SuppressWarnings("static-access")
 	private void clear(ModelMap modelMap) {
 
@@ -349,29 +333,31 @@ public class FacturaController {
 		modelMap.addAttribute("productos", this.productos);
 	}
 	
-	
+	//Fecha 
 	private String getFecha() {
 		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");		
 		String fecha = formato.format(new Date());
 		return fecha;
 	}
 	
+	//NumFactura
 	private String getNumFactura() {
-		int max = facturaService.findMax();		
+	int max = facturaService.findMax();		
 		String numFactura = String.join("-", "FAC","000".concat(String.valueOf(max+1)));
 		return numFactura;
-		
-	}
 	
+	}	
+	
+	//Format Number
 	private Double getFormatNumber(Double numero) {
 		DecimalFormat df = new DecimalFormat("#.00");
 		return Double.parseDouble(df.format(numero));
 		//return (double) Math.round(numero * 100d) / 100d;
 	}
-
 	
+	//add
 	@SuppressWarnings("static-access")
-	public void add( int cantidad , Empresa_producto empresa_producto) {
+	public void add( int cantidad , Producto producto) {
 		FacturaDetalle facturaDetalle = new FacturaDetalle();
 		
 		facturaDetalle.setEmpresaProducto(empresa_producto);
@@ -379,34 +365,31 @@ public class FacturaController {
 		facturaDetalle.setDescuento1(0.0);
 		facturaDetalle.setDescuento2(0.0);
 		
-	    double subtotal = empresa_producto.getIdproducto().getPrecioProducto() * cantidad;
-	    facturaDetalle.setSubTotal(subtotal);
-
-	    int nuevoStock = empresa_producto.getIdproducto().getStock() - cantidad;
-	    empresa_producto.getIdproducto().setStock(nuevoStock);
+		facturaDetalle.setSubTotal(facturaDetalle.getEmpresaProducto().getIdproducto().getPrecioProducto()*cantidad);
+		facturaDetalle.getEmpresaProducto().getIdproducto().setStock(facturaDetalle.getEmpresaProducto().getIdproducto().getStock() - cantidad);
 		
 		this.list.add(facturaDetalle);
-		int index= this.list.indexOf(facturaDetalle);
+		int index = this.list.indexOf(facturaDetalle);
 		facturaDetalle.setIdFacturaDetalle(index);
 		this.list.set(index, facturaDetalle);
 	}
 	
-	
+	//up
 	@SuppressWarnings("static-access")
 	public void up(int cantidad, int idFDList) {
 	    FacturaDetalle facturaDetalle = findAll().get(idFDList);
-
-	    Producto producto = facturaDetalle.getEmpresaProducto().getIdproducto();
-
-	    int nuevoStock = producto.getStock() - cantidad;
-	    producto.setStock(nuevoStock);
-
+	    
+	    facturaDetalle.getEmpresaProducto().getIdproducto().setStock(facturaDetalle.getEmpresaProducto().getIdproducto().getStock()+facturaDetalle.getCantidad());
+	    
 	    facturaDetalle.setCantidad(cantidad);
-	    facturaDetalle.setSubTotal(producto.getPrecioProducto() * cantidad);
-
+	    facturaDetalle.setSubTotal(facturaDetalle.getEmpresaProducto().getIdproducto().getPrecioProducto() * cantidad);
+	    
+	    facturaDetalle.getEmpresaProducto().getIdproducto().setStock(facturaDetalle.getEmpresaProducto().getIdproducto().getStock()-cantidad);
+	    
 	    this.list.set(idFDList, facturaDetalle);
 	}
 	
+	//del 
 	@SuppressWarnings("static-access")
 	public void del(int idFDList) {
 				
@@ -419,7 +402,7 @@ public class FacturaController {
 		}	
 	}
 	
-	
+	//List Detalle Factira
 	@SuppressWarnings("static-access")
 	public List<FacturaDetalle> findAll(){
 		return this.list;

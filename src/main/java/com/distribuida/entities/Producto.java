@@ -108,17 +108,13 @@ public class Producto {
 			this.precioProducto = precioProducto;
 		}
 
-
 		public int getStock() {
 			return stock;
 		}
 
-
 		public void setStock(int stock) {
 			this.stock = stock;
 		}
-
-
 
 		public String getImgProducto() {
 			return ImgProducto;
@@ -138,8 +134,6 @@ public class Producto {
 		public void setCategoria(Categoria categoria) {
 			this.categoria = categoria;
 		}
-
-
 
 
 		@Override

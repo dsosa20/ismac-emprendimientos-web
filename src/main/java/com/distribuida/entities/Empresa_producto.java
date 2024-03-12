@@ -32,7 +32,7 @@ public class Empresa_producto {
 	private Empresa idempresa; 
 	
 	@ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JoinColumn(name = "fk_idProduct")
+	@JoinColumn(name = "fk_idProducto")
 	private Producto idproducto;
 	
 	public Empresa_producto() {}

@@ -14,6 +14,8 @@
 	<button id="mostrar-pedido">Agregar Pedido</button>
 	<button id="mostrar-formapago">Agregar Forma de pago</button>
 	<button id="mostrar-empresaProducto">Agregar Empresa Producto</button>
+	<button id="mostrar-producto">Agregar Producto</button>
+	
 	
 	<textarea >${empresa_productosAgregados}</textarea>
 	<textarea >${productosAgregados}</textarea>
@@ -123,6 +125,43 @@
 					</tbody>
 				</table>
 			</form>
+				<button onClick="this.parentElement.close()">Aceptar</button>
+		</dialog>
+	</div>
+	
+	<div>
+		<dialog id="alert-dialog-productos">
+		
+			<form action="findOneProducto" id="formProducto" name="formProducto" method="get" >
+				<table>
+					<thead>
+						<tr>
+							<th>idProducto</th>
+							<th>numeroProducto</th>
+							<th>descripcion</th>
+							<th>precioProducto</th>
+							<th>stock</th>
+							<th>ImgProducto</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="item" items="${productos}">
+							<tr>
+								<td>
+									<button><a href="${pageContext.request.contextPath}/facturacion/findOneProducto?idProducto=${item.idProducto}">Agregar</a></button>
+								</td>
+								<td>${item.idProducto}</td>
+								<td>${item.numeroProducto}</td>
+								<td>${item.descripcion}</td>
+								<td>${item.precioProducto}</td>
+								<td>${item.stock}</td>
+								<td>porducto</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</form> 
+			
 				<button onClick="this.parentElement.close()">Aceptar</button>
 		</dialog>
 	</div>
@@ -310,6 +349,12 @@
 	mostrarEmpresaProducto.addEventListener("click", function () {
 		const alertDialogEmpresaProductos = document.querySelector("#alert-dialog-EmpresaProductos");
 		alertDialogEmpresaProductos.showModal();
+	});
+	
+	const mostrarProducto = document.querySelector("#mostrar-producto"); 
+	mostrarProducto.addEventListener("click", function () {
+		const alertDialogProductos = document.querySelector("#alert-dialog-productos");
+		alertDialogProductos.showModal();
 	});
 	
 	</script>

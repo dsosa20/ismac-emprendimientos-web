@@ -18,7 +18,7 @@ public class Empresa {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "idEmpresa")
 	private int idEmpresa;
-	@Column(name = "CirPago")
+	@Column(name = "QRPago")
 	private String CirPago;  
 	@Column(name = "nombreempresa")
 	private String nombreempresa;  
