@@ -242,15 +242,15 @@ public class FacturaController {
 
         facturaService.add(0, numFactura, new Date(), totalNeto, iva, total, idCliente, idPedido, idFormaPago);
 
-        this.list.forEach(item -> {            
-            facturaService.add(0, item.getCantidad(), item.getSubTotal(), facturaService.findMax(),item.getEmpresaProducto(),item.getProducto());
-        });
-        
-        this.list.forEach(item -> {
-
-            empresa_productoService.up(item.getEmpresaProducto().setIdproducto(idProducto));
-        
-        });
+//        this.list.forEach(item -> {            
+//            facturaService.add(0, item.getCantidad(), item.getSubTotal(), facturaService.findMax(),item.getEmpresaProducto(),item.getProducto());
+//        });
+//        
+//        this.list.forEach(item -> {
+//
+//            empresa_productoService.up(item.getEmpresaProducto().setIdproducto(idProducto));
+//        
+//        });
         clear(modelMap);
         
         return "redirect:/facturacion/principal";
